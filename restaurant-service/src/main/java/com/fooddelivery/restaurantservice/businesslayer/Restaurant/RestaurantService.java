@@ -17,12 +17,12 @@ public interface RestaurantService {
     List<RestaurantResponseModel> getRestaurants();
 
     //TODO: change to requestModel and responseModel
-    Restaurant getRestaurantsById(String restaurantId);
+    RestaurantResponseModel getRestaurantsById(String restaurantId);
     //Restaurant addRestaurant(RestaurantRequestModel restaurantRequestModel);
 
     //TODO: change to requestModel
-    Restaurant addRestaurant(Restaurant newRestaurant);
-/*    RestaurantResponseModel addRestaurant(RestaurantRequestModel restaurantRequestModel);*/
+    //Restaurant addRestaurant(Restaurant newRestaurant);
+    RestaurantResponseModel addRestaurant(RestaurantRequestModel restaurantRequestModel);
 
     //TODO: change to requestModel
 

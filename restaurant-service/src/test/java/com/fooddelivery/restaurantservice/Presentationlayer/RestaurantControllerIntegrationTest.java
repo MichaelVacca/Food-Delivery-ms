@@ -76,11 +76,11 @@ public class RestaurantControllerIntegrationTest {
                 .expectBody()
                 //.jsonPath("$.restaurantId").isEqualTo(VALID_RESTAURANT_ID)
                 .jsonPath("$.restaurantName").isEqualTo(VALID_RESTAURANT_NAME)
-                .jsonPath("$.address.countryName").isEqualTo(VALID_COUNTRY_NAME)
-                .jsonPath("$.address.streetName").isEqualTo(VALID_STREET_NAME)
-                .jsonPath("$.address.cityName").isEqualTo(VALID_CITY_NAME)
-                .jsonPath("$.address.provinceName").isEqualTo(VALID_PROVINCE_NAME)
-                .jsonPath("$.address.postalCode").isEqualTo(VALID_POSTAL_CODE);
+                .jsonPath("$.countryName").isEqualTo(VALID_COUNTRY_NAME)
+                .jsonPath("$.streetName").isEqualTo(VALID_STREET_NAME)
+                .jsonPath("$.cityName").isEqualTo(VALID_CITY_NAME)
+                .jsonPath("$.provinceName").isEqualTo(VALID_PROVINCE_NAME)
+                .jsonPath("$.postalCode").isEqualTo(VALID_POSTAL_CODE);
 
 
     }
@@ -119,13 +119,14 @@ public class RestaurantControllerIntegrationTest {
                 expectedPostalCode);*/
 
 
-        Restaurant restaurant = new Restaurant(expectedName,expectedCountryName,expectedStreetName,expectedCityName,expectedProvinceName,expectedPostalCode);
+        //Restaurant restaurant = new Restaurant(expectedName,expectedCountryName,expectedStreetName,expectedCityName,expectedProvinceName,expectedPostalCode);
+        RestaurantRequestModel restaurantRequestModel = new RestaurantRequestModel(expectedName,expectedCountryName,expectedStreetName,expectedCityName,expectedProvinceName,expectedPostalCode);
 
 
         webTestClient.post()
                 .uri(BASE_URI_RESTAURANTS)
                 .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(restaurant)
+                .bodyValue(restaurantRequestModel)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isCreated()

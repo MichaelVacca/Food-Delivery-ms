@@ -13,8 +13,8 @@ public class RestaurantRequestModel {
 
     String countryName;
     String streetName;
-    String provinceName;
     String cityName;
+    String provinceName;
     String postalCode;
 
 }

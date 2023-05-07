@@ -32,13 +32,13 @@ public class RestaurantController {
     }
 
     @GetMapping("/{restaurantId}")
-    public Restaurant getRestaurantsByRestaurantId(@PathVariable String restaurantId){
+    public RestaurantResponseModel getRestaurantsByRestaurantId(@PathVariable String restaurantId){
         return restaurantService.getRestaurantsById(restaurantId);
     }
     //my lab
     @PostMapping()
-    ResponseEntity <Restaurant> addRestaurant(@RequestBody  Restaurant restaurant){
-        return ResponseEntity.status(HttpStatus.CREATED).body(restaurantService.addRestaurant(restaurant));
+    ResponseEntity <RestaurantResponseModel> addRestaurant(@RequestBody  RestaurantRequestModel restaurantRequestModel){
+        return ResponseEntity.status(HttpStatus.CREATED).body(restaurantService.addRestaurant(restaurantRequestModel));
     }
 
 
