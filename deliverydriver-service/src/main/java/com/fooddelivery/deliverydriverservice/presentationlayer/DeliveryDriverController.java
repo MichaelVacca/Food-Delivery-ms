@@ -4,6 +4,9 @@ package com.fooddelivery.deliverydriverservice.presentationlayer;
 
 import com.fooddelivery.deliverydriverservice.businessLayer.DeliveryDriverService;
 import com.fooddelivery.deliverydriverservice.datalayer.DeliveryDriver;
+import org.apache.coyote.Response;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,25 +26,28 @@ public class DeliveryDriverController {
     }
 
     @GetMapping("/{deliveryDriverId}")
-    public DeliveryDriver getDeliveryDriversById(@PathVariable String deliveryDriverId){
+    public DeliveryDriverResponseModel getDeliveryDriversById(@PathVariable String deliveryDriverId){
         return deliveryDriverService.getDeliveryDriversById(deliveryDriverId);
     }
 
     @PostMapping()
-    public DeliveryDriver addDeliveryDriver(@RequestBody DeliveryDriver newDeliveryDriver){
-        return deliveryDriverService.addNewDeliveryDriver(newDeliveryDriver);
+    ResponseEntity <DeliveryDriverResponseModel> addDeliveryDriver(@RequestBody DeliveryDriverRequestModel deliveryDriverRequestModel){
+        return ResponseEntity.status(HttpStatus.CREATED).body(deliveryDriverService.addNewDeliveryDriver(deliveryDriverRequestModel));
     }
 
     @PutMapping("/{deliveryDriverId}")
-    public DeliveryDriver updateDeliveryDriverInfo(@RequestBody DeliveryDriver deliveryDriver,
+    ResponseEntity <DeliveryDriverResponseModel> updateDeliveryDriverInfo(@RequestBody DeliveryDriverRequestModel deliveryDriverRequestModel,
                                                    @PathVariable String deliveryDriverId){
-        return deliveryDriverService.updateExistingDeliveryDriver(deliveryDriver,deliveryDriverId);
+        return ResponseEntity.ok().body(deliveryDriverService.updateExistingDeliveryDriver(deliveryDriverRequestModel,deliveryDriverId));
+
 
     }
 
     @DeleteMapping("/{deliveryDriverId}")
-    public void deleteDeliveryDriverById(@PathVariable String deliveryDriverId){
+    ResponseEntity <Void> deleteDeliveryDriverById(@PathVariable String deliveryDriverId){
+
         deliveryDriverService.deleteExistingDeliveryDriver(deliveryDriverId);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
 
