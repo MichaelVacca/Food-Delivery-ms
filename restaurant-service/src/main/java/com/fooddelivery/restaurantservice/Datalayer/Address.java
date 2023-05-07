@@ -5,6 +5,8 @@ import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.util.Objects;
+
+@Generated
 @Embeddable
 public class Address {
 

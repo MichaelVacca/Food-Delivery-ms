@@ -1,6 +1,8 @@
 package com.fooddelivery.restaurantservice.Presentationlayer;
 
 import com.fooddelivery.restaurantservice.Datalayer.*;
+import jakarta.transaction.Transactional;
+import org.hibernate.cache.spi.support.AbstractReadWriteAccess;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -119,7 +121,7 @@ public class RestaurantControllerIntegrationTest {
                 expectedPostalCode);*/
 
 
-        //Restaurant restaurant = new Restaurant(expectedName,expectedCountryName,expectedStreetName,expectedCityName,expectedProvinceName,expectedPostalCode);
+        Restaurant restaurant = new Restaurant(expectedName,expectedCountryName,expectedStreetName,expectedCityName,expectedProvinceName,expectedPostalCode);
         RestaurantRequestModel restaurantRequestModel = new RestaurantRequestModel(expectedName,expectedCountryName,expectedStreetName,expectedCityName,expectedProvinceName,expectedPostalCode);
 
 
@@ -240,24 +242,6 @@ public class RestaurantControllerIntegrationTest {
                 .jsonPath("$.message").value(matchesPattern("Restaurant with id: .* not found."));
     }
 
-/*    @Test
-    public void whenDeleteRestaurant_thenDeleteRestaurantAndAllMenusInRestaurant()  {
-        Integer actualNumOfMenusBeforeDelete = 2;
-        Integer actualNumOfMenusAfterDelete = 0;
-
-        assertEquals(actualNumOfMenusBeforeDelete,
-                menuRepository.findAllByRestaurantIdentifier_RestaurantId(VALID_RESTAURANT_ID).size());
-
-        webTestClient.delete()
-                .uri(BASE_URI_RESTAURANTS+"/"+VALID_RESTAURANT_ID)
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange()
-                .expectStatus().isNoContent();
-
-        assertEquals(actualNumOfMenusAfterDelete,
-                menuRepository.findAllByRestaurantIdentifier_RestaurantId(VALID_RESTAURANT_ID).size());
-        assertFalse(restaurantRepository.existsByRestaurantIdentifier_RestaurantId(VALID_RESTAURANT_ID));
-    }*/
 
     @Test
     public void whenDeleteRestaurant_withValidRestaurantId_thenDeleteRestaurant() {
@@ -365,9 +349,18 @@ public class RestaurantControllerIntegrationTest {
     public void whenAddMenuToRestaurantWithValidId_WithValidMenuID_thenReturnNewMenu(){
         String newMenuId= "f9824810-d4a8-11ed-afa1-0242ac120002";
         String newTypeOfMenu = "Extras";
+        String itemId;
+        MenuIdentifier menuIdentifier  = new MenuIdentifier();
+        itemIdentifier itemIdentifier = new itemIdentifier();
+        itemId = itemIdentifier.getItemId();
 
+        Items one = new Items("Burger","Grilled hamburger",6.99);
+        Items two = new Items("French Fries","Grilled hamburger",3.99);
+        List<Items> items = new ArrayList<>(Arrays.asList(one,two));
 
-        MenuRequestModel menuRequestModel = createNewMenuRequestModel(VALID_RESTAURANT_ID,newMenuId,newTypeOfMenu);
+        Menu menu = new Menu(menuIdentifier,newTypeOfMenu,items);
+
+        MenuRequestModel menuRequestModel = createNewMenuRequestModel(VALID_RESTAURANT_ID,newMenuId,newTypeOfMenu );
 
         webTestClient.post()
                 .uri(BASE_URI_RESTAURANTS + "/" + VALID_RESTAURANT_ID +"/" + "menus")
@@ -494,14 +487,6 @@ public class RestaurantControllerIntegrationTest {
 
     }
 
-    String restaurantName;
-    String countryName;
-    String streetName;
-    String provinceName;
-    String cityName;
-    String postalCode;
-
-
     @Test
     public void whenAddMenuToRestaurantWithInvalidId_thenReturnNotFoundException() {
         String nonExistentRestaurantId = "non-existent-restaurant-id";
@@ -551,6 +536,76 @@ public class RestaurantControllerIntegrationTest {
                 .expectBody()
                 .jsonPath("$.message").value(matchesPattern("Restaurant with id: .* not found."));
     }
+
+    @Test
+    public void whenCreateMenuInRestaurant_withInvalidMenuId_thenTHrowInvalidMenuId() {
+        String invalidMenuId = VALID_MENU_ID + "1";
+        String newTypeOfMenu = "Entrees";
+        MenuRequestModel menuRequestModel = createNewMenuRequestModel(VALID_RESTAURANT_ID, invalidMenuId, newTypeOfMenu);
+
+        webTestClient.post()
+                .uri(BASE_URI_RESTAURANTS + "/" + VALID_RESTAURANT_ID + "/menus")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .bodyValue(menuRequestModel)
+                .exchange()
+                .expectStatus().isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY)
+                .expectBody()
+                .jsonPath("$.message").value(matchesPattern("Invalid menu id provided.*"));
+
+    }
+
+    @Test
+    public void whenUpdateMenuInRestaurantByInvalidMenuId_thenThrowInvalidMenuId() {
+        String invalidMenuId = VALID_MENU_ID + "1";
+        String newTypeOfMenu = "Entrees";
+        MenuRequestModel menuRequestModel = createNewMenuRequestModel(VALID_RESTAURANT_ID, invalidMenuId, newTypeOfMenu);
+
+        webTestClient.put()
+                .uri(BASE_URI_RESTAURANTS + "/" + VALID_RESTAURANT_ID + "/menus/" + invalidMenuId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .bodyValue(menuRequestModel)
+                .exchange()
+                .expectStatus().isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY)
+                .expectBody()
+                .jsonPath("$.message").value(matchesPattern("Invalid menu id provided.*"));
+    }
+
+
+/*        @Test
+        @Transactional
+        public void testAddMenuToRestaurantDuplicateMenuIdentifierException() {
+            String expectedName= "Wendy's21";
+            String expectedCountryName="Canada";
+            String expectedStreetName= "489th Street";
+            String expectedProvinceName = "Ontario";
+            String expectedCityName = "Toronto";
+            String expectedPostalCode ="M9Z 4A1";
+
+            String restaurantId = "testRestaurantId";
+            String menuId = "testMenuId";
+            MenuRequestModel menuRequestModel = new MenuRequestModel();
+            menuRequestModel.setMenuId(menuId);
+
+            // Create a restaurant and save it in the repository
+            Restaurant restaurant = new Restaurant(expectedName);
+            restaurant.setRestaurantIdentifier(new RestaurantIdentifier(restaurantId));
+            restaurantRepository.save(restaurant);
+
+            // Create a menu and save it in the repository
+            Menu menu = new Menu();
+            menu.setMenuIdentifier(new MenuIdentifier(menuId));
+            menu.setRestaurant(restaurant);
+            menuRepository.save(menu);
+
+            // Call addMenuToRestaurant and expect a DuplicateMenuIdentifierException to be thrown
+            assertThrows(DuplicateMenuIdentifierException.class, () -> {
+                menuService.addMenuToRestaurant(menuRequestModel, restaurantId);
+            });
+        }
+    }*/
+
 
 
 

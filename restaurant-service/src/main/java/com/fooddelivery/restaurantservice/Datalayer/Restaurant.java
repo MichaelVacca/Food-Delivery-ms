@@ -45,14 +45,6 @@ public class Restaurant {
         this.menuIdentifier = new MenuIdentifier();
     }
 
-    public Restaurant(String restaurantName, MenuIdentifier menuIdentifier, /*Address address*/ RestaurantIdentifier restaurantIdentifier) {
-
-        this.restaurantName = restaurantName;
-        this.menuIdentifier = menuIdentifier;
-        //this.address = address;
-        this.restaurantIdentifier = new RestaurantIdentifier();
-    }
-
     public Restaurant(String restaurantName) {
         this.restaurantIdentifier = new RestaurantIdentifier();
         this.restaurantName = restaurantName;

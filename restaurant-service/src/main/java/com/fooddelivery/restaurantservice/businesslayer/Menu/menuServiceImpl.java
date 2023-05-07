@@ -96,28 +96,14 @@ public class menuServiceImpl implements MenuService {
                     requestModelToEntity(menuRequestModel, menuIdentifier, restaurant.getRestaurantIdentifier())));*/
             return menuResponseMapper.entityToResponseModel(menuRepository.save(menu));
         }
-/*        catch (Exception ex){
+        catch (Exception ex){
             if(ex.getMessage().contains("constraint [menu_id]") ||
             ex.getCause().toString().contains("ConstraintViolationException")){
                 throw new DuplicateMenuIdentifierException("Restaurant already has a menu with the menu id:" +
                         menuRequestModel.getMenuId());
                 }
             throw new InvalidInputException("An unknown error has occurred");
-            }*/
-
-        catch (Exception ex){
-            // Add logging statements
-            log.error("Exception message: {}", ex.getMessage());
-            log.error("Exception cause: {}", ex.getCause());
-
-            if(ex.getMessage().contains("constraint [menu_id]") ||
-                    ex.getCause().toString().contains("ConstraintViolationException")){
-                throw new DuplicateMenuIdentifierException("Restaurant already has a menu with the menu id:" +
-                        menuRequestModel.getMenuId());
             }
-            throw new InvalidInputException("An unknown error has occurred");
-        }
-
     }
 
     @Override
