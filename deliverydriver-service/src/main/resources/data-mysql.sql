@@ -1,6 +1,6 @@
 
 INSERT INTO drivers (delivery_driver_id, first_name, last_name, date_of_birth, description, employee_since, country_name, street_name, city_name, province_name, postal_code)
-VALUES ('bfec8718-92f3-410f-9343-d4dc6b763f10', 'Osborne', 'Ivanyukov', 'February 3, 1998', 'Delivery driver with 5 years of experience', 'March 15, 2017', 'Canada', 'Donald', 'Saint-André-Avellin', 'Québec', 'M5V 2L7');
+VALUES ('bfec8718-92f3-410f-9343-d4dc6b763f10', 'Osborne', 'Ivanyukov', 'February 3, 1998', 'Delivery driver with 5 years of experience', 'March 15, 2017', 'Canada', 'Donald', 'Saint-Andre-Avellin', 'Quebec', 'M5V 2L7');
 
 INSERT INTO drivers (delivery_driver_id, first_name, last_name, date_of_birth, description, employee_since, country_name, street_name, city_name, province_name, postal_code)
 VALUES ('7c252b01-b4cf-4de6-ac14-b2f47d3d94f4', 'Lethia', 'Griffith', 'July 12, 2004', 'Experienced delivery driver', 'January 4, 2018', 'Canada', 'Fieldstone', 'Assomption', 'Québec', 'V6A 2S5');

@@ -34,7 +34,7 @@ public class GlobalControllerExceptionHandler {
 
     @ResponseStatus(UNPROCESSABLE_ENTITY)
     @ExceptionHandler(DuplicateIDException.class)
-    public HttpErrorInfo handleDuplicateMenuIdentifierException(WebRequest request, Exception ex){
+    public HttpErrorInfo handleDuplicateIdException(WebRequest request, Exception ex){
         return createHttpErrorInfo(UNPROCESSABLE_ENTITY, request, ex);
     }
 

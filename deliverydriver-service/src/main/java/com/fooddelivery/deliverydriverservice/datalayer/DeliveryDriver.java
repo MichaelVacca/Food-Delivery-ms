@@ -28,7 +28,7 @@ public class DeliveryDriver {
         this.deliveryDriverIdentifier = new DeliveryDriverIdentifier();
     }
 
-    public DeliveryDriver(String firstName, String lastName, String dateOfBirth, String description, String employeeSince, DeliveryDriverIdentifier deliveryDriverIdentifier, Address address) {
+    public DeliveryDriver(String firstName, String lastName, String dateOfBirth, String description, String employeeSince,  Address address) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.dateOfBirth = dateOfBirth;
