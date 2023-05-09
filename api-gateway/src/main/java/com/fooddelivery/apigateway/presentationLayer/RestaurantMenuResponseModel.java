@@ -7,11 +7,14 @@ import java.util.List;
 
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = false)
 public class RestaurantMenuResponseModel extends RepresentationModel<RestaurantMenuResponseModel> {
 
-    private final String restaurantId;
-    private final String restaurantName;
-    private List<MenuResponseModel> allItems;
+    private  String restaurantId;
+    private  String restaurantName;
+    private String menuId;
+    private String typeOfMenu;
 
 
 

@@ -8,11 +8,13 @@ import java.util.List;
 
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = false)
 public class MenuResponseModel extends RepresentationModel<MenuResponseModel> {
-    private final String restaurantId;
-    private final String menuId;
-    private final String typeOfMenu;
-    private final List<Items> items;
+    private  String restaurantId;
+    private  String menuId;
+    private  String typeOfMenu;
+    private  List<Items> items;
 
 
 }

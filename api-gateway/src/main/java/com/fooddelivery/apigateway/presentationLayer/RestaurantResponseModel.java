@@ -5,12 +5,14 @@ import org.springframework.hateoas.RepresentationModel;
 
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = false)
 public class RestaurantResponseModel extends RepresentationModel<RestaurantResponseModel> {
-    private final String restaurantId;
-    private final String restaurantName;
-    private final String countryName;
-    private final String streetName;
-    private final String provinceName;
-    private final String cityName;
-    private final String postalCode;
+    private  String restaurantId;
+    private  String restaurantName;
+    private  String countryName;
+    private  String streetName;
+    private  String provinceName;
+    private  String cityName;
+    private  String postalCode;
 }

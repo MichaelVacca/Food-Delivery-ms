@@ -1,6 +1,7 @@
 package com.fooddelivery.apigateway.domainClientLayer;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fooddelivery.apigateway.presentationLayer.DeliveryDriverRequestModel;
 import com.fooddelivery.apigateway.presentationLayer.DeliveryDriverResponseModel;
 import com.fooddelivery.apigateway.utils.HttpErrorInfo;
 import com.fooddelivery.apigateway.utils.exceptions.InvalidInputException;
@@ -31,8 +32,22 @@ public class DeliveryDriverServiceClient {
                                        @Value("${app.deliverydriver-service.port}") String deliveryDriverServicePort) {
         this.restTemplate = restTemplate;
         this.objectMapper = objectMapper;
-        this.DELIVERY_DRIVER_SERVICE_BASE_URL = "http://" + deliveryDriverServiceHost + ":" + deliveryDriverServicePort + "/api/v1/api/v1/deliveryDrivers";
+        this.DELIVERY_DRIVER_SERVICE_BASE_URL = "http://" + deliveryDriverServiceHost + ":" + deliveryDriverServicePort + "/api/v1/deliveryDrivers";
     }
+
+    public DeliveryDriverResponseModel[] getAllDeliveryDriversAggregate() {
+        DeliveryDriverResponseModel[] deliveryDriverResponseModels;
+        try {
+            String url = DELIVERY_DRIVER_SERVICE_BASE_URL;
+            deliveryDriverResponseModels = restTemplate.getForObject(url, DeliveryDriverResponseModel[].class);
+            log.debug("5. Received in API-Gateway DeliveryDriver Service Client getAllDeliveryDriversAggregate");
+        } catch (HttpClientErrorException ex) {
+            log.debug("5.");
+            throw handleHttpClientException(ex);
+        }
+        return deliveryDriverResponseModels;
+    }
+
 
     public DeliveryDriverResponseModel getDeliveryDrivers(String deliveryDriverId) {
         DeliveryDriverResponseModel deliveryDriverResponseModel;
@@ -47,6 +62,46 @@ public class DeliveryDriverServiceClient {
             throw handleHttpClientException(ex);
         }
         return deliveryDriverResponseModel;
+    }
+
+    public DeliveryDriverResponseModel addDeliveryDriver(DeliveryDriverRequestModel deliveryDriverRequestModel) {
+
+        DeliveryDriverResponseModel deliveryDriverResponseModel;
+        try {
+            String url = DELIVERY_DRIVER_SERVICE_BASE_URL;
+            deliveryDriverResponseModel = restTemplate.postForObject(
+                    url, deliveryDriverRequestModel, DeliveryDriverResponseModel.class);
+            log.debug("5. Received in API-Gateway DeliveryDriver Service Client addDeliveryDriver");
+        }
+        catch (HttpClientErrorException ex) {
+            log.debug("5.");
+            throw handleHttpClientException(ex);
+        }
+        return deliveryDriverResponseModel;
+    }
+
+    public void updateDeliveryDriver(String deliveryDriverId, DeliveryDriverRequestModel deliveryDriverRequestModel) {
+        try{
+            String url = DELIVERY_DRIVER_SERVICE_BASE_URL + "/" + deliveryDriverId;
+            restTemplate.put(url, deliveryDriverRequestModel, DeliveryDriverResponseModel.class);
+            log.debug("5. Received in API-Gateway DeliveryDriver Service Client updateDeliveryDriver");
+        }
+        catch (HttpClientErrorException ex) {
+            log.debug("5.");
+            throw handleHttpClientException(ex);
+        }
+    }
+
+    public void deleteDeliveryDriver(String deliveryDriverId) {
+        try{
+            String url = DELIVERY_DRIVER_SERVICE_BASE_URL + "/" + deliveryDriverId;
+            restTemplate.delete(url);
+            log.debug("5. Received in API-Gateway DeliveryDriver Service Client deleteDeliveryDriver");
+        }
+        catch (HttpClientErrorException ex) {
+            log.debug("5.");
+            throw handleHttpClientException(ex);
+        }
     }
 
     private RuntimeException handleHttpClientException(HttpClientErrorException ex) {

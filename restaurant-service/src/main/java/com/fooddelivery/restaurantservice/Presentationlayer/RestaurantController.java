@@ -26,11 +26,14 @@ public class RestaurantController {
 /*    public RestaurantController(com.example.fooddeliveryws.restaurantSubDomain.businesslayer.Restaurant.restaurantService restaurantService) {
         this.restaurantService = restaurantService;
     }*/
+    //TODO: RESPONSE ENTITY
     @GetMapping
     public List<RestaurantResponseModel> getRestaurants(){
         return restaurantService.getRestaurants();
     }
 
+
+    //TODO: RESPONSE ENTITY
     @GetMapping("/{restaurantId}")
     public RestaurantResponseModel getRestaurantsByRestaurantId(@PathVariable String restaurantId){
         return restaurantService.getRestaurantsById(restaurantId);

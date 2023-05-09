@@ -12,6 +12,8 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.Map;
 
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.UNPROCESSABLE_ENTITY;
@@ -20,8 +22,8 @@ import static org.springframework.http.HttpStatus.UNPROCESSABLE_ENTITY;
 @Component
 public class RestaurantServiceClient {
 
-    private RestTemplate restTemplate;
-    private ObjectMapper objectMapper;
+    private final RestTemplate restTemplate;
+    private final ObjectMapper objectMapper;
     private final String RESTAURANT_SERVICE_BASE_URL;
     public RestaurantServiceClient(RestTemplate restTemplate,
                                   ObjectMapper objectMapper,
@@ -71,6 +73,7 @@ public class RestaurantServiceClient {
             throw handleHttpClientException(ex);
         }
     }
+
 
     public RestaurantResponseModel addRestaurantAggregate(RestaurantRequestModel restaurantRequestModel){
         RestaurantResponseModel restaurantResponseModel;

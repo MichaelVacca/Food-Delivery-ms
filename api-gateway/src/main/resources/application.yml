@@ -16,7 +16,7 @@ app:
     host: localhost
     port: 7002
   deliverydriver-service:
-    host: deliverydriver-service
+    host: localhost
     port: 7003
 
 # mandatory

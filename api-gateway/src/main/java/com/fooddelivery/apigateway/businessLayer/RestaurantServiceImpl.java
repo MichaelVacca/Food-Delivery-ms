@@ -35,6 +35,11 @@ public class RestaurantServiceImpl implements RestaurantService{
     }
 
     @Override
+    public MenuResponseModel getMenuByMenuId(String restaurantId, String menuId) {
+        return restaurantServiceClient.getMenuByMenuId(restaurantId, menuId);
+    }
+
+    @Override
     public void updateMenuInRestaurantByMenuId(MenuRequestModel menuRequestModel, String restaurantId, String menuId) {
         restaurantServiceClient.modifyMenuInRestaurant(restaurantId,menuId,menuRequestModel);
     }
