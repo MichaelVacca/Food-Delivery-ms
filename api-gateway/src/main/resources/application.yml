@@ -21,10 +21,13 @@ app:
 
 # mandatory
 ---
-
+spring:
+  config:
+    activate:
+      on-profile: docker
 
 # for docker
-spring:
+server:
   port: 8080
 
 app:

@@ -2,7 +2,6 @@ package com.fooddelivery.apigateway.presentationLayer;
 
 import lombok.Data;
 
-@Data
 public class RestaurantRequestModel {
     String restaurantName;
     String countryName;

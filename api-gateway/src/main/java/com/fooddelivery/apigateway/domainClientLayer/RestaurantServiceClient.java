@@ -30,7 +30,7 @@ public class RestaurantServiceClient {
         this.restTemplate = restTemplate;
         this.objectMapper = objectMapper;
         this.RESTAURANT_SERVICE_BASE_URL =
-                "http://" + restaurantServiceHost+":"+restaurantServicePort+"api/v1/restaurants";
+                "http://" + restaurantServiceHost+":"+restaurantServicePort+"/api/v1/restaurants";
 
     }
 

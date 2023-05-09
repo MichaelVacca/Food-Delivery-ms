@@ -1,25 +1,23 @@
 package com.fooddelivery.apigateway.presentationLayer;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Value;
+import lombok.*;
 
-@Value
-@Builder
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = false)
 public class DeliveryDriverResponseModel {
 
-    private final String deliveryDriverId;
-    private final String firstName;
-    private final String lastName;
-    private final String dateOfBirth;
-    private final String description;
-    private final String employeeSince;
-    private final String countryName;
-    private final String streetName;
-    private final String cityName;
-    private final String provinceName;
-    private final String postalCode;
+    private  String deliveryDriverId;
+    private  String firstName;
+    private  String lastName;
+    private  String dateOfBirth;
+    private  String description;
+    private  String employeeSince;
+    private  String countryName;
+    private  String streetName;
+    private  String cityName;
+    private  String provinceName;
+    private  String postalCode;
 
 }

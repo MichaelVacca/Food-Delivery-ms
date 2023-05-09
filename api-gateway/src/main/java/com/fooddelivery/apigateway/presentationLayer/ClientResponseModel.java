@@ -1,24 +1,22 @@
 package com.fooddelivery.apigateway.presentationLayer;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Value;
+import lombok.*;
 
-@Value
-@Builder
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = false)
 public class ClientResponseModel {
 
-    private final String clientId;
-    private final String userName;
-    private final String password;
-    private final String age;
-    private final String emailAddress;
-    private final String phoneNumber;
-    private final String countryName;
-    private final String streetName;
-    private final String cityName;
-    private final String provinceName;
-    private final String postalCode;
+    private  String clientId;
+    private  String userName;
+    private  String password;
+    private  String age;
+    private  String emailAddress;
+    private  String phoneNumber;
+    private  String countryName;
+    private  String streetName;
+    private  String cityName;
+    private  String provinceName;
+    private  String postalCode;
 }

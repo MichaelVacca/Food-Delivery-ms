@@ -1,17 +1,14 @@
 package com.fooddelivery.apigateway.presentationLayer;
 
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Value;
+import lombok.*;
+import org.springframework.hateoas.RepresentationModel;
 
 import java.util.List;
 
-@Value
-@Builder
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class MenuResponseModel {
+@Data
+@AllArgsConstructor
+public class MenuResponseModel extends RepresentationModel<MenuResponseModel> {
     private final String restaurantId;
     private final String menuId;
     private final String typeOfMenu;
