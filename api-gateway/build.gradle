@@ -51,6 +51,8 @@ dependencies {
 	//implementation 'mysql:mysql-connector-java'
 	//runtimeOnly 'com.h2database:h2:'
 	implementation "org.mapstruct:mapstruct:${mapstructVersion}"
+    testImplementation 'junit:junit:4.13.1'
+	testImplementation 'junit:junit:4.13.1'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	compileOnly "org.mapstruct:mapstruct-processor:${mapstructVersion}"
 	annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}",

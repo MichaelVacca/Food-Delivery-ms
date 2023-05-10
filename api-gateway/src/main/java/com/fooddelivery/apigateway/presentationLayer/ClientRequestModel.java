@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Value;
 import org.springframework.hateoas.RepresentationModel;
 
+@Builder
 public class ClientRequestModel extends RepresentationModel<ClientRequestModel> {
 
      String userName;
