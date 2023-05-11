@@ -43,6 +43,7 @@ public class DeliveryDriverController {
     @PutMapping(value="/{deliveryDriverId}", consumes = "application/json", produces = "application/json")
     ResponseEntity<Void> updateDeliveryDriver(@PathVariable String deliveryDriverId, @RequestBody DeliveryDriverRequestModel deliveryDriverRequestModel) {
         log.debug("1, Received in api-gateway deliveryDriversController updateDeliveryDriver");
+        deliveryDriverService.updateDeliveryDriver(deliveryDriverId, deliveryDriverRequestModel);
         return  ResponseEntity.noContent().build();
     }
 

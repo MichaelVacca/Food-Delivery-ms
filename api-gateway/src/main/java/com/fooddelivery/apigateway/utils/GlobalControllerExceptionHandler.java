@@ -3,6 +3,7 @@ package com.fooddelivery.apigateway.utils;
 
 
 import com.fooddelivery.apigateway.utils.exceptions.DuplicateIDException;
+import com.fooddelivery.apigateway.utils.exceptions.DuplicateUserNameException;
 import com.fooddelivery.apigateway.utils.exceptions.InvalidInputException;
 import com.fooddelivery.apigateway.utils.exceptions.NotFoundException;
 import lombok.extern.slf4j.Slf4j;
@@ -34,7 +35,13 @@ public class GlobalControllerExceptionHandler {
 
     @ResponseStatus(UNPROCESSABLE_ENTITY)
     @ExceptionHandler(DuplicateIDException.class)
-    public HttpErrorInfo handleDuplicateMenuIdentifierException(WebRequest request, Exception ex){
+    public HttpErrorInfo handleDuplicateIdException(WebRequest request, Exception ex){
+        return createHttpErrorInfo(UNPROCESSABLE_ENTITY, request, ex);
+    }
+
+    @ResponseStatus(UNPROCESSABLE_ENTITY)
+    @ExceptionHandler(DuplicateUserNameException.class)
+    public HttpErrorInfo handleDuplicateUserNameException(WebRequest request, Exception ex){
         return createHttpErrorInfo(UNPROCESSABLE_ENTITY, request, ex);
     }
 

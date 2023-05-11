@@ -75,19 +75,42 @@ class ClientControllerTest {
     public void setup() {
         baseUrl = baseUrl + port + "/api/v1/clients";
     }
-        @Test
-        public void getClientAggregateIT() {
-            String clientId = "c3540a89-cb47-4c96-888e-ff96708db4d8";
-            ClientResponseModel clientResponseModel = new ClientResponseModel(clientId, "1","1","1","1","1","1","1","1","1","1");
-            when(clientsService.getClient(clientId)).thenReturn(clientResponseModel);
 
-            ResponseEntity<ClientResponseModel> response = restTemplate.getForEntity(baseUrl + "/" + clientId, ClientResponseModel.class);
+    @Test
+    public void getAllClientsTest() throws Exception {
+        ClientResponseModel clientResponseMode1 = new ClientResponseModel("clientId", "username", "password", "age",
+                "email", "phone", "country", "street", "city", "province", "postalCode");
+        ClientResponseModel clientResponseMode2 = new ClientResponseModel("clientId2", "username2", "password2", "age2",
+                "email2", "phone2", "country2", "street2", "city2", "province2", "postalCode2");
+        ClientResponseModel[] clientResponseModels = new ClientResponseModel[]{clientResponseMode1, clientResponseMode2};
 
-            assertEquals(HttpStatus.OK, response.getStatusCode());
-            assertEquals(clientId, response.getBody().getClientId());
-            // assert other fields...
-        }
 
+
+        when(clientsService.getAllClientsAggregate()).thenReturn(clientResponseModels);
+
+        mockMvc.perform(get("/api/v1/clients")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        verify(clientsService, times(1)).getAllClientsAggregate();
+
+    }
+
+
+    @Test
+    public void getClientTest() throws Exception {
+        String clientId = "1";
+        ClientResponseModel clientResponseModel = new ClientResponseModel(clientId, "username", "password", "age",
+                "email", "phone", "country", "street", "city", "province", "postalCode");
+
+        when(clientsService.getClient(clientId)).thenReturn(clientResponseModel);
+
+        mockMvc.perform(get("/api/v1/clients/" + clientId)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        verify(clientsService, times(1)).getClient(clientId);
+    }
 
     @Test
     public void returnAllClients() throws Exception {

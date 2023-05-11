@@ -46,7 +46,6 @@ class ClientServiceClientTest {
 
     @BeforeEach
     public void setup() {
-        // make sure to setup the RestTemplate, ObjectMapper, and base url correctly
         clientServiceClient = new ClientServiceClient(restTemplate, new ObjectMapper(), "localhost", "8080");
     }
 
@@ -92,7 +91,7 @@ class ClientServiceClientTest {
         assertEquals(result.getPostalCode(), "1");
 
         verify(restTemplate, times(1)).getForObject(baseUrl + "/" + clientId, ClientResponseModel.class);
-        // assert other fields...
+
     }
     @Test
     public void addClientTest() {
@@ -115,7 +114,6 @@ class ClientServiceClientTest {
 
         ClientResponseModel result = clientServiceClient.addClient(clientRequestModel);
         assertEquals(result.getClientId(), clientId);
-        // assert other fields...
 
         // Verify that postForObject method was called
         verify(restTemplate, times(1)).postForObject(baseUrl, clientRequestModel, ClientResponseModel.class);
@@ -145,23 +143,6 @@ class ClientServiceClientTest {
 
         assertTrue(exception.getMessage().contains("Not Found"));
     }
-
-
-
-/*    @Test
-    public void testGetClient_InvalidInputException() {
-        String clientId = "invalid-input";
-        HttpClientErrorException ex = HttpClientErrorException.create(HttpStatus.UNPROCESSABLE_ENTITY, "Unprocessable Entity",
-                HttpHeaders.EMPTY, null, null);
-
-        when(restTemplate.getForObject(baseUrl + "/" + clientId, ClientResponseModel.class)).thenThrow(ex);
-
-        Exception exception = assertThrows(InvalidInputException.class, () ->
-                clientServiceClient.getClient(clientId));
-
-        assertTrue(exception.getMessage().contains("Unprocessable Entity"));
-    }*/
-
     @Test
     public void testAddClient_NotFoundException() throws JsonProcessingException {
         ClientRequestModel clientRequestModel = ClientRequestModel.builder()

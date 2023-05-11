@@ -8,8 +8,12 @@ import com.fooddelivery.apigateway.utils.exceptions.InvalidInputException;
 import com.fooddelivery.apigateway.utils.exceptions.NotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RequestCallback;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
@@ -72,8 +76,7 @@ public class DeliveryDriverServiceClient {
             deliveryDriverResponseModel = restTemplate.postForObject(
                     url, deliveryDriverRequestModel, DeliveryDriverResponseModel.class);
             log.debug("5. Received in API-Gateway DeliveryDriver Service Client addDeliveryDriver");
-        }
-        catch (HttpClientErrorException ex) {
+        } catch (HttpClientErrorException ex) {
             log.debug("5.");
             throw handleHttpClientException(ex);
         }
@@ -81,46 +84,51 @@ public class DeliveryDriverServiceClient {
     }
 
     public void updateDeliveryDriver(String deliveryDriverId, DeliveryDriverRequestModel deliveryDriverRequestModel) {
-        try{
+        try {
             String url = DELIVERY_DRIVER_SERVICE_BASE_URL + "/" + deliveryDriverId;
-            restTemplate.put(url, deliveryDriverRequestModel, DeliveryDriverResponseModel.class);
-            log.debug("5. Received in API-Gateway DeliveryDriver Service Client updateDeliveryDriver");
-        }
-        catch (HttpClientErrorException ex) {
+            restTemplate.execute(url, HttpMethod.PUT, requestCallback(deliveryDriverRequestModel), clientHttpResponse -> null);
+
+        } catch (HttpClientErrorException ex) {
             log.debug("5.");
             throw handleHttpClientException(ex);
         }
     }
 
     public void deleteDeliveryDriver(String deliveryDriverId) {
-        try{
+        try {
             String url = DELIVERY_DRIVER_SERVICE_BASE_URL + "/" + deliveryDriverId;
-            restTemplate.delete(url);
-            log.debug("5. Received in API-Gateway DeliveryDriver Service Client deleteDeliveryDriver");
-        }
-        catch (HttpClientErrorException ex) {
+            restTemplate.execute(url, HttpMethod.DELETE, null, null);
+
+        } catch (HttpClientErrorException ex) {
             log.debug("5.");
             throw handleHttpClientException(ex);
         }
     }
+    private RequestCallback requestCallback(final DeliveryDriverRequestModel deliveryDriverRequestModel) {
+        return clientHttpRequest -> {
+            ObjectMapper mapper = new ObjectMapper();
+            mapper.writeValue(clientHttpRequest.getBody(), deliveryDriverRequestModel);
+            clientHttpRequest.getHeaders().add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
+            clientHttpRequest.getHeaders().add(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE);
+        };
+    }
+        private RuntimeException handleHttpClientException(HttpClientErrorException ex) {
+            if (ex.getStatusCode() == NOT_FOUND) {
+                return new NotFoundException(getErrorMessage(ex));
+            }
+            if (ex.getStatusCode() == UNPROCESSABLE_ENTITY) {
+                return new InvalidInputException(getErrorMessage(ex));
+            }
+            return ex;
+        }
 
-    private RuntimeException handleHttpClientException(HttpClientErrorException ex) {
-        if (ex.getStatusCode() == NOT_FOUND) {
-            return new NotFoundException(getErrorMessage(ex));
+
+        private String getErrorMessage(HttpClientErrorException ex){
+            try {
+                return objectMapper.readValue(ex.getResponseBodyAsString(), HttpErrorInfo.class).getMessage();
+            } catch (IOException ioex) {
+                return ioex.getMessage();
+            }
         }
-        if (ex.getStatusCode() == UNPROCESSABLE_ENTITY) {
-            return new InvalidInputException(getErrorMessage(ex));
-        }
-        log.warn("Got a unexpected HTTP error: {}, will rethrow it", ex.getStatusCode());
-        log.warn("Error body: {}", ex.getResponseBodyAsString());
-        return ex;
-    }
-    private String getErrorMessage(HttpClientErrorException ex) {
-        try {
-            return objectMapper.readValue(ex.getResponseBodyAsString(), HttpErrorInfo.class).getMessage();
-        }
-        catch (IOException ioex) {
-            return ioex.getMessage();
-        }
-    }
+
 }
