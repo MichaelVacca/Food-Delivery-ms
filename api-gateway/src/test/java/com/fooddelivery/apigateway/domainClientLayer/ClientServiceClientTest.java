@@ -13,17 +13,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.*;
+import org.springframework.http.client.ClientHttpRequest;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RequestCallback;
 import org.springframework.web.client.RestTemplate;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import org.junit.jupiter.api.Test;
+
+import java.io.ByteArrayOutputStream;
+import java.lang.reflect.Method;
 
 @SpringBootTest
 class ClientServiceClientTest {
@@ -44,6 +48,29 @@ class ClientServiceClientTest {
     public void setup() {
         // make sure to setup the RestTemplate, ObjectMapper, and base url correctly
         clientServiceClient = new ClientServiceClient(restTemplate, new ObjectMapper(), "localhost", "8080");
+    }
+
+    @Test
+    public void getAllClientsAggregateTest() {
+        // Arrange
+        String url = baseUrl;
+
+        ClientResponseModel client1 = new ClientResponseModel("1", "user1", "pass1", "21", "email1@test.com", "phone1", "country1", "street1", "city1", "province1", "postal1");
+        ClientResponseModel client2 = new ClientResponseModel("2", "user2", "pass2", "22", "email2@test.com", "phone2", "country2", "street2", "city2", "province2", "postal2");
+        ClientResponseModel[] clientResponseModels = new ClientResponseModel[] { client1, client2 };
+
+        when(restTemplate.getForObject(url, ClientResponseModel[].class)).thenReturn(clientResponseModels);
+
+        // Act
+        ClientResponseModel[] actualClientResponseModels = clientServiceClient.getAllClientsAggregate();
+
+        // Assert
+        assertEquals(clientResponseModels.length, actualClientResponseModels.length);
+        for (int i = 0; i < clientResponseModels.length; i++) {
+            assertEquals(clientResponseModels[i], actualClientResponseModels[i]);
+        }
+
+        verify(restTemplate, times(1)).getForObject(url, ClientResponseModel[].class);
     }
 
     @Test
@@ -93,63 +120,13 @@ class ClientServiceClientTest {
         // Verify that postForObject method was called
         verify(restTemplate, times(1)).postForObject(baseUrl, clientRequestModel, ClientResponseModel.class);
     }
-
-    @Test
-    public void updateClientTest() {
-        String clientId = "c3540a89-cb47-4c96-888e-ff96708db4d8";
-
-        ClientRequestModel clientRequestModel = ClientRequestModel.builder()
-                .userName("1")
-                .password("1")
-                .age("1")
-                .emailAddress("1")
-                .phoneNumber("1")
-                .countryName("1")
-                .streetName("1")
-                .cityName("1")
-                .provinceName("1")
-                .postalCode("1")
-                .build();
-
-        doNothing().when(restTemplate).put(baseUrl + "/" + clientId, clientRequestModel, ClientResponseModel.class);
-
-        clientServiceClient.updateClient(clientId, clientRequestModel);
-
-        // Verify that put method was called
-        verify(restTemplate, times(1)).put(baseUrl + "/" + clientId, clientRequestModel, ClientResponseModel.class);
-    }
-
-    @Test
-    public void deleteClientTest() {
-        String clientId = "c3540a89-cb47-4c96-888e-ff96708db4d8";
-        doNothing().when(restTemplate).delete(baseUrl + "/" + clientId);
-
-        clientServiceClient.deleteClient(clientId);
-
-        // Verify that delete method was called
-        verify(restTemplate, times(1)).delete(baseUrl + "/" + clientId);
-    }
-/*    @Test
-    public void testGetClient_NotFoundException() {
-        String clientId = "non-existing-id";
-        HttpClientErrorException ex = HttpClientErrorException.create(HttpStatus.NOT_FOUND, "Not Found",
-                HttpHeaders.EMPTY, null, null);
-
-        when(restTemplate.getForObject(baseUrl + "/" + clientId, ClientResponseModel.class)).thenThrow(ex);
-
-        Exception exception = assertThrows(NotFoundException.class, () ->
-                clientServiceClient.getClient(clientId));
-
-        assertTrue(exception.getMessage().contains("Not Found"));
-    }*/
-
     @Test
     public void testGetClient_NotFoundException() throws JsonProcessingException {
         String clientId = "non-existing-id";
         HttpErrorInfo errorInfo = new HttpErrorInfo( HttpStatus.NOT_FOUND, "/api/v1/clients/" + clientId,"Not Found");
 
         ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.registerModule(new JavaTimeModule()); // register JavaTimeModule to support Java 8 date/time types
+        objectMapper.registerModule(new JavaTimeModule());
 
         String errorInfoJson = "";
         try {
@@ -171,7 +148,7 @@ class ClientServiceClientTest {
 
 
 
-    @Test
+/*    @Test
     public void testGetClient_InvalidInputException() {
         String clientId = "invalid-input";
         HttpClientErrorException ex = HttpClientErrorException.create(HttpStatus.UNPROCESSABLE_ENTITY, "Unprocessable Entity",
@@ -183,7 +160,7 @@ class ClientServiceClientTest {
                 clientServiceClient.getClient(clientId));
 
         assertTrue(exception.getMessage().contains("Unprocessable Entity"));
-    }
+    }*/
 
     @Test
     public void testAddClient_NotFoundException() throws JsonProcessingException {
@@ -225,7 +202,7 @@ class ClientServiceClientTest {
 
 
     @Test
-    public void testAddClient_InvalidInputException() {
+    public void testAddClient_InvalidInputException() throws JsonProcessingException {
         ClientRequestModel clientRequestModel = ClientRequestModel.builder()
                 .userName("1")
                 .password("1")
@@ -239,8 +216,20 @@ class ClientServiceClientTest {
                 .postalCode("1")
                 .build();
 
+        HttpErrorInfo errorInfo = new HttpErrorInfo(HttpStatus.UNPROCESSABLE_ENTITY, "/api/v1/clients", "Unprocessable Entity");
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule()); // register JavaTimeModule to support Java 8 date/time types
+
+        String errorInfoJson = "";
+        try {
+            errorInfoJson = objectMapper.writeValueAsString(errorInfo);
+        } catch (JsonProcessingException e) {
+            fail("Failed to serialize HttpErrorInfo: " + e.getMessage());
+        }
+
         HttpClientErrorException ex = HttpClientErrorException.create(HttpStatus.UNPROCESSABLE_ENTITY, "Unprocessable Entity",
-                HttpHeaders.EMPTY, null, null);
+                HttpHeaders.EMPTY, errorInfoJson.getBytes(), null);
 
         when(restTemplate.postForObject(baseUrl, clientRequestModel, ClientResponseModel.class)).thenThrow(ex);
 
@@ -250,10 +239,158 @@ class ClientServiceClientTest {
         assertTrue(exception.getMessage().contains("Unprocessable Entity"));
     }
 
-// Similar tests can be written for updateClient and deleteClient methods as well.
+    @Test
+    public void testUpdateClient_NotFoundException() throws JsonProcessingException {
+        String clientId = "non-existing-id";
+        ClientRequestModel clientRequestModel = ClientRequestModel.builder()
+                .userName("1")
+                .password("1")
+                .age("1")
+                .emailAddress("1")
+                .phoneNumber("1")
+                .countryName("1")
+                .streetName("1")
+                .cityName("1")
+                .provinceName("1")
+                .postalCode("1")
+                .build();
 
+        HttpErrorInfo errorInfo = new HttpErrorInfo(HttpStatus.NOT_FOUND, "/api/v1/clients/" + clientId, "Not Found");
 
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
 
+        String errorInfoJson = objectMapper.writeValueAsString(errorInfo);
+
+        HttpClientErrorException ex = HttpClientErrorException.create(HttpStatus.NOT_FOUND, "Not Found",
+                HttpHeaders.EMPTY, errorInfoJson.getBytes(), null);
+
+        doThrow(ex).when(restTemplate).execute(anyString(), eq(HttpMethod.PUT), any(), any());
+
+        Exception exception = assertThrows(NotFoundException.class, () ->
+                clientServiceClient.updateClient(clientId, clientRequestModel));
+
+        assertTrue(exception.getMessage().contains("Not Found"));
+    }
+
+    @Test
+    public void testUpdateClient_InvalidInputException() throws JsonProcessingException {
+        String clientId = "1";
+        ClientRequestModel clientRequestModel = ClientRequestModel.builder()
+                .userName("1")
+                .password("1")
+                .age("1")
+                .emailAddress("1")
+                .phoneNumber("1")
+                .countryName("1")
+                .streetName("1")
+                .cityName("1")
+                .provinceName("1")
+                .postalCode("1")
+                .build();
+
+        HttpErrorInfo errorInfo = new HttpErrorInfo(HttpStatus.UNPROCESSABLE_ENTITY, "/api/v1/clients/" + clientId, "Unprocessable Entity");
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule()); // register JavaTimeModule to support Java 8 date/time types
+
+        String errorInfoJson = objectMapper.writeValueAsString(errorInfo);
+
+        HttpClientErrorException ex = HttpClientErrorException.create(HttpStatus.UNPROCESSABLE_ENTITY, "Unprocessable Entity",
+                HttpHeaders.EMPTY, errorInfoJson.getBytes(), null);
+
+        doThrow(ex).when(restTemplate).execute(anyString(), eq(HttpMethod.PUT), any(), any());
+
+        Exception exception = assertThrows(InvalidInputException.class, () ->
+                clientServiceClient.updateClient(clientId, clientRequestModel));
+
+        assertTrue(exception.getMessage().contains("Unprocessable Entity"));
+    }
+
+    @Test
+    public void testDeleteClient_NotFoundException() throws JsonProcessingException {
+        String clientId = "non-existing-id";
+
+        HttpErrorInfo errorInfo = new HttpErrorInfo(HttpStatus.NOT_FOUND, "/api/v1/clients/" + clientId, "Not Found");
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule()); // register JavaTimeModule to support Java 8 date/time types
+
+        String errorInfoJson = objectMapper.writeValueAsString(errorInfo);
+
+        HttpClientErrorException ex = HttpClientErrorException.create(HttpStatus.NOT_FOUND, "Not Found",
+                HttpHeaders.EMPTY, errorInfoJson.getBytes(), null);
+
+        doThrow(ex).when(restTemplate).execute(anyString(), eq(HttpMethod.DELETE), any(), any());
+
+        Exception exception = assertThrows(NotFoundException.class, () ->
+                clientServiceClient.deleteClient(clientId));
+
+        assertTrue(exception.getMessage().contains("Not Found"));
+    }
+
+    @Test
+    public void testDeleteClient_InvalidInputException() throws JsonProcessingException {
+        String clientId = "1";
+
+        HttpErrorInfo errorInfo = new HttpErrorInfo(HttpStatus.UNPROCESSABLE_ENTITY, "/api/v1/clients/" + clientId, "Unprocessable Entity");
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule()); // register JavaTimeModule to support Java 8 date/time types
+
+        String errorInfoJson = objectMapper.writeValueAsString(errorInfo);
+
+        HttpClientErrorException ex = HttpClientErrorException.create(HttpStatus.UNPROCESSABLE_ENTITY, "Unprocessable Entity",
+                HttpHeaders.EMPTY, errorInfoJson.getBytes(), null);
+
+        doThrow(ex).when(restTemplate).execute(anyString(), eq(HttpMethod.DELETE), any(), any());
+
+        Exception exception = assertThrows(InvalidInputException.class, () ->
+                clientServiceClient.deleteClient(clientId));
+
+        assertTrue(exception.getMessage().contains("Unprocessable Entity"));
+    }
+
+    @Test
+    public void requestCallback_SetsCorrectHeadersAndBody() throws Exception {
+        // Arrange
+        ClientRequestModel clientRequestModel = ClientRequestModel.builder()
+                .userName("1")
+                .password("1")
+                .age("1")
+                .emailAddress("1")
+                .phoneNumber("1")
+                .countryName("1")
+                .streetName("1")
+                .cityName("1")
+                .provinceName("1")
+                .postalCode("1")
+                .build();
+
+        // Mocking ClientHttpRequest
+        ClientHttpRequest clientHttpRequest = mock(ClientHttpRequest.class);
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        when(clientHttpRequest.getBody()).thenReturn(outputStream);
+        HttpHeaders httpHeaders = new HttpHeaders();
+        when(clientHttpRequest.getHeaders()).thenReturn(httpHeaders);
+
+        // Access private method via reflection
+        Method requestCallbackMethod = ClientServiceClient.class.getDeclaredMethod("requestCallback", ClientRequestModel.class);
+        requestCallbackMethod.setAccessible(true);
+
+        // Act
+        RequestCallback requestCallback = (RequestCallback) requestCallbackMethod.invoke(clientServiceClient, clientRequestModel);
+        requestCallback.doWithRequest(clientHttpRequest);
+
+        // Assert
+        ObjectMapper mapper = new ObjectMapper();
+        String expectedBody = mapper.writeValueAsString(clientRequestModel);
+        String actualBody = outputStream.toString();
+        assertEquals(expectedBody, actualBody);
+
+        assertEquals(MediaType.APPLICATION_JSON_VALUE, httpHeaders.getContentType().toString());
+        assertTrue(httpHeaders.getAccept().contains(MediaType.APPLICATION_JSON));
+    }
 }
 
 

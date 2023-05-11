@@ -15,10 +15,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.client.ExpectedCount;
 import org.springframework.test.web.client.MockRestServiceServer;
@@ -61,6 +58,9 @@ class ClientControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
+    @MockBean
+    private RestTemplate restTemplate1;
+
 
 
     private ObjectMapper objectMapper = new ObjectMapper();
@@ -87,9 +87,6 @@ class ClientControllerTest {
             assertEquals(clientId, response.getBody().getClientId());
             // assert other fields...
         }
-
-        // Similarly, you can write a test for addClient(), updateClient(), deleteClient(), and getAllClientsAggregate()
-
 
 
     @Test
@@ -208,8 +205,10 @@ class ClientControllerTest {
 
         verify(clientsService, times(1)).deleteClient(clientId);
     }
-
 }
+
+
+
 
 
 

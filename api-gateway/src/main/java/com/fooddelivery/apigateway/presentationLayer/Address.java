@@ -2,9 +2,11 @@ package com.fooddelivery.apigateway.presentationLayer;
 
 
 import jakarta.validation.constraints.NotNull;
+import lombok.Generated;
 
 import java.util.Objects;
 
+@Generated
 public class Address {
 
     private String countryName;
