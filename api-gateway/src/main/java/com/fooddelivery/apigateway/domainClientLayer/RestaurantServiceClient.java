@@ -7,8 +7,12 @@ import com.fooddelivery.apigateway.utils.exceptions.InvalidInputException;
 import com.fooddelivery.apigateway.utils.exceptions.NotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RequestCallback;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
@@ -77,24 +81,26 @@ public class RestaurantServiceClient {
 
     public RestaurantResponseModel addRestaurantAggregate(RestaurantRequestModel restaurantRequestModel){
         RestaurantResponseModel restaurantResponseModel;
-        try{
+
             String url = RESTAURANT_SERVICE_BASE_URL;
             restaurantResponseModel =
                     restTemplate.postForObject(url, restaurantRequestModel, RestaurantResponseModel.class);
             log.debug("5. Received in API_Gateway Restaurant Service Client addRestaurantAggregate with name: " + restaurantRequestModel.getRestaurantName());
 
-        }
-        catch(HttpClientErrorException ex){
+
+/*        catch(HttpClientErrorException ex){
             log.debug("5.");
             throw handleHttpClientException(ex);
-        }
+        }*/
         return restaurantResponseModel;
     }
 
     public void updateRestaurantAggregate(String restaurantId, RestaurantRequestModel restaurantRequestModel){
         try{
             String url = RESTAURANT_SERVICE_BASE_URL + "/" + restaurantId;
-            restTemplate.put(url, restaurantRequestModel);
+/*            restTemplate.put(url, restaurantRequestModel);*/
+            restTemplate.execute(url, HttpMethod.PUT,requestCallback(restaurantRequestModel), clientHttpResponse -> null);
+
             log.debug("5. Received in API-Gateway Restaurant Service Client updateRestaurantAggregate with name: " + restaurantRequestModel.getRestaurantName());
         }
 
@@ -119,7 +125,8 @@ public class RestaurantServiceClient {
     public void modifyMenuInRestaurant(String restaurantId, String menuId, MenuRequestModel menuRequestModel){
         try{
             String url = RESTAURANT_SERVICE_BASE_URL + "/" + restaurantId + "/menus/" + menuId;
-            restTemplate.put(url,menuRequestModel);
+            /*restTemplate.put(url,menuRequestModel);*/
+            restTemplate.execute(url, HttpMethod.PUT,requestCallbackMenu(menuRequestModel), clientHttpResponse -> null);
         }
         catch(HttpClientErrorException ex){
             throw handleHttpClientException(ex);
@@ -129,7 +136,7 @@ public class RestaurantServiceClient {
     public void deleteMenuInRestaurant(String restaurantId, String menuId){
         try{
             String url = RESTAURANT_SERVICE_BASE_URL + "/" + restaurantId + "/menus/" + menuId;
-            restTemplate.delete(url);
+            restTemplate.execute(url, HttpMethod.DELETE,null, null);
         }
         catch(HttpClientErrorException ex){
             log.debug("5.");
@@ -141,6 +148,7 @@ public class RestaurantServiceClient {
         try{
             String url = RESTAURANT_SERVICE_BASE_URL + "/" + restaurantId;
             restTemplate.delete(url);
+            restTemplate.execute(url, HttpMethod.DELETE,null,   null);
             log.debug("Received in API-Gateway Restaurant Service Client delete Restaurant with restaurant id: " + restaurantId);
         }
         catch(HttpClientErrorException ex){
@@ -149,7 +157,22 @@ public class RestaurantServiceClient {
         }
     }
 
-
+    private RequestCallback requestCallback(final RestaurantRequestModel restaurantRequestModel) {
+        return clientHttpRequest -> {
+            ObjectMapper mapper = new ObjectMapper();
+            mapper.writeValue(clientHttpRequest.getBody(), restaurantRequestModel);
+            clientHttpRequest.getHeaders().add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
+            clientHttpRequest.getHeaders().add(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE);
+        };
+    }
+    private RequestCallback requestCallbackMenu(final MenuRequestModel menuRequestModel) {
+        return clientHttpRequest -> {
+            ObjectMapper mapper = new ObjectMapper();
+            mapper.writeValue(clientHttpRequest.getBody(), menuRequestModel);
+            clientHttpRequest.getHeaders().add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
+            clientHttpRequest.getHeaders().add(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE);
+        };
+    }
     private RuntimeException handleHttpClientException(HttpClientErrorException ex) {
         if (ex.getStatusCode() == NOT_FOUND) {
             return new NotFoundException(getErrorMessage(ex));

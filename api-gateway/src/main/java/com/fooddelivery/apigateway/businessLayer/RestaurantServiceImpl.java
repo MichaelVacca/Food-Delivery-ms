@@ -50,7 +50,7 @@ public class RestaurantServiceImpl implements RestaurantService{
     }
 
     @Override
-    public void deleteMenuFromInventory(String restaurantId, String menuId) {
+    public void deleteMenuFromRestaurant(String restaurantId, String menuId) {
         restaurantServiceClient.deleteMenuInRestaurant(restaurantId,menuId);
     }
 

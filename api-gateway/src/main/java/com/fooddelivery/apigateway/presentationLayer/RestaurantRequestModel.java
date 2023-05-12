@@ -1,8 +1,10 @@
 package com.fooddelivery.apigateway.presentationLayer;
 
+import lombok.Builder;
 import lombok.Data;
 import org.springframework.hateoas.RepresentationModel;
 
+@Builder
 public class RestaurantRequestModel extends RepresentationModel<RestaurantRequestModel> {
     String restaurantName;
     String countryName;

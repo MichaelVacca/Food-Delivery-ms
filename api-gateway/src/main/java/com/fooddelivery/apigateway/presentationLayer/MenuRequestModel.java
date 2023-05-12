@@ -26,6 +26,12 @@ public class MenuRequestModel {
         this.items = items;
     }
 
+    public MenuRequestModel(String menuId, String restaurantId, String typeOfMenu) {
+        this.menuId = menuId;
+        this.restaurantId = restaurantId;
+        this.typeOfMenu = typeOfMenu;
+    }
+
     public String getMenuId() {
         return menuId;
     }

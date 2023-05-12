@@ -15,13 +15,13 @@ private Double itemCost;
 Items(){
 
 }
-
-
     public Items(@NotNull String itemName, @NotNull String itemDesc, @NotNull Double itemCost) {
         Objects.requireNonNull(this.itemName = itemName);
         Objects.requireNonNull(this.itemDesc = itemDesc);
         Objects.requireNonNull(this.itemCost = itemCost);
     }
+
+
 
     public @NotNull String getItemName() {
         return itemName;

@@ -3,15 +3,11 @@ package com.fooddelivery.apigateway.presentationLayer;
 
 import com.fooddelivery.apigateway.businessLayer.RestaurantService;
 
-import com.fooddelivery.apigateway.utils.exceptions.InvalidInputException;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.Map;
 @Slf4j
 @RestController
 @RequestMapping("api/v1/restaurants")
@@ -34,9 +30,7 @@ public class RestaurantController {
 
     @GetMapping(value="/{restaurantId}", produces = "application/json")
     ResponseEntity<RestaurantMenuResponseModel> getRestaurantAggregate(@PathVariable String restaurantId){
-        if(restaurantId.length()!=UUID_SIZE){
-            throw new InvalidInputException("Restaurant id is invalid: " + restaurantId);
-        }
+
         log.debug("1. Received in Restaurant Controller getRestaurantMenuAggregate with restaurantId: " + restaurantId);
         return ResponseEntity.ok().body(restaurantService.getRestaurantAggregate(restaurantId));
     }
@@ -46,12 +40,11 @@ public class RestaurantController {
         log.debug("1. Received in Restaurant Controller addRestaurant");
         return ResponseEntity.status(HttpStatus.CREATED).body(restaurantService.addRestaurant(restaurantRequestModel));
     }
-
     @PutMapping(value="/{restaurantId}", consumes = "application/json", produces = "application/json")
     ResponseEntity<Void> updateRestaurant(@RequestBody RestaurantRequestModel restaurantRequestModel, @PathVariable String restaurantId){
-        if(restaurantId.length()!=UUID_SIZE){
+/*        if(restaurantId.length()!=UUID_SIZE){
             throw new InvalidInputException("Restaurant id is invalid: " + restaurantId);
-        }
+        }*/
         restaurantService.updateRestaurantAggregate(restaurantId, restaurantRequestModel);
         log.debug("1. Received in Restaurant Controller updateRestaurant");
         return ResponseEntity.noContent().build();
@@ -59,9 +52,9 @@ public class RestaurantController {
 
     @DeleteMapping(value="/{restaurantId}", produces = "application/json")
     ResponseEntity<Void> deleteRestaurant(@PathVariable String restaurantId){
-        if(restaurantId.length()!=UUID_SIZE){
+/*        if(restaurantId.length()!=UUID_SIZE){
             throw new InvalidInputException("Restaurant id is invalid: " + restaurantId);
-        }
+        }*/
         restaurantService.deleteRestaurantAggregate(restaurantId);
         log.debug("1. Received in Restaurant Controller deleteRestaurant");
         return ResponseEntity.noContent().build();
@@ -74,46 +67,26 @@ public class RestaurantController {
 
     @GetMapping(value="/{restaurantId}/menus/{menuId}", produces = "application/json")
     ResponseEntity<MenuResponseModel> getMenuById(@PathVariable String restaurantId, @PathVariable String menuId){
-        if(restaurantId.length()!=UUID_SIZE){
-            throw new InvalidInputException("Restaurant id is invalid: " + restaurantId);
-        }
-        if(menuId.length()!=UUID_SIZE){
-            throw new InvalidInputException("Menu id is invalid: " + menuId);
-        }
+
         log.debug("1. Received in Restaurant Controller getMenu");
         return ResponseEntity.ok().body(restaurantService.getMenuByMenuId(restaurantId, menuId));
     }
 
     @PostMapping(value="/{restaurantId}/menus", consumes = "application/json" ,produces = "application/json")
     ResponseEntity<MenuResponseModel> addMenuToRestaurant(@RequestBody MenuRequestModel menuRequestModel, @PathVariable String restaurantId){
-        if(restaurantId.length()!=UUID_SIZE){
-            throw new InvalidInputException("Restaurant id is invalid: " + restaurantId);
-        }
         log.debug("1. Received in Restaurant Controller addMenuToRestaurant");
         return ResponseEntity.status(HttpStatus.CREATED).body(restaurantService.addMenuToRestaurant(restaurantId, menuRequestModel));
     }
 
     @PutMapping(value="/{restaurantId}/menus/{menuId}", consumes = "application/json" ,produces = "application/json")
     ResponseEntity<Void> updateMenuInRestaurantByMenuId(@RequestBody MenuRequestModel menuRequestModel, @PathVariable String restaurantId, @PathVariable String menuId){
-        if(restaurantId.length()!=UUID_SIZE){
-            throw new InvalidInputException("Restaurant id is invalid: " + restaurantId);
-        }
-        if(menuId.length()!=UUID_SIZE){
-            throw new InvalidInputException("Menu id is invalid: " + menuId);
-        }
         restaurantService.updateMenuInRestaurantByMenuId(menuRequestModel, restaurantId, menuId);
         log.debug("1. Received in Restaurant Controller updateMenuInRestaurantByMenuId");
         return ResponseEntity.noContent().build();
     }
     @DeleteMapping(value="/{restaurantId}/menus/{menuId}", produces = "application/json")
     ResponseEntity<Void> deleteMenuFromInventory(@PathVariable String restaurantId, @PathVariable String menuId){
-        if(restaurantId.length()!=UUID_SIZE){
-            throw new InvalidInputException("Restaurant id is invalid: " + restaurantId);
-        }
-        if(menuId.length()!=UUID_SIZE){
-            throw new InvalidInputException("Menu id is invalid: " + menuId);
-        }
-        restaurantService.deleteMenuFromInventory(restaurantId, menuId);
+        restaurantService.deleteMenuFromRestaurant(restaurantId, menuId);
         log.debug("1. Received in Restaurant Controller deleteMenuFromInventory");
         return ResponseEntity.noContent().build();
     }
