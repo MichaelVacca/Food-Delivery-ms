@@ -1,11 +1,11 @@
 package com.fooddelivery.ordersservice.datalayer;
 
-import jakarta.persistence.Embeddable;
+
 import jakarta.validation.constraints.NotNull;
 
 import java.util.Objects;
 
-@Embeddable
+
 public class Items {
 private String itemName;
 private String itemDesc;
