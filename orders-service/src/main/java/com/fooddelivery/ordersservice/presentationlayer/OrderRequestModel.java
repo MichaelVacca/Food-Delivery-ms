@@ -16,8 +16,8 @@ public class OrderRequestModel {
      String restaurantId;
      String menuId;
      Double totalPrice;
-     String driverId;
+     String deliveryDriverId;
      OrderStatus orderStatus;
-     private List<Items> items;
+      List<Items> items;
      LocalDate orderDate;
 }

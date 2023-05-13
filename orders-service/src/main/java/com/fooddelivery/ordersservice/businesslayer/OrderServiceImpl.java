@@ -42,9 +42,11 @@ public class OrderServiceImpl implements OrderService {
         if(clientResponseModel == null){
              throw new NotFoundException("Client not found with id : " + clientId);
         }
-        DeliveryDriverResponseModel deliveryDriverResponseModel = deliveryDriverServiceClient.getDeliveryDrivers(orderRequestModel.getDriverId());
+
+        log.info("Driver ID from orderRequestModel: " + orderRequestModel.getDeliveryDriverId());
+        DeliveryDriverResponseModel deliveryDriverResponseModel = deliveryDriverServiceClient.getDeliveryDrivers(orderRequestModel.getDeliveryDriverId());
         if(deliveryDriverResponseModel == null){
-            throw new NotFoundException("Delivery driver not found with id : " + orderRequestModel.getDriverId());
+            throw new NotFoundException("Delivery driver not found with id : " + orderRequestModel.getDeliveryDriverId());
         }
 
         MenuResponseModel menuResponseModel = restaurantServiceClient.getMenuByMenuId(orderRequestModel.getRestaurantId(), orderRequestModel.getMenuId());
@@ -91,9 +93,6 @@ public class OrderServiceImpl implements OrderService {
 
                 restaurantServiceClient.modifyMenuInRestaurant(menuResponseModel.getRestaurantId(), menuRequestModel.getMenuId(),menuRequestModel);
                 return orderResponseModelMapper.entityToResponseModel(saved);
-
-
-
 
     }
 
